@@ -3,37 +3,71 @@ import { CandlePoint, StockData, Timeframe } from "@/lib/types";
 
 const FINNHUB_KEY = process.env.FINNHUB_KEY ?? "";
 
-const TF_SECONDS: Record<Timeframe, number> = {
-  "24h": 24 * 60 * 60,
-  "1w": 7 * 24 * 60 * 60,
-  "1m": 30 * 24 * 60 * 60,
-  "6m": 182 * 24 * 60 * 60,
-  "1y": 365 * 24 * 60 * 60,
-  "5y": 5 * 365 * 24 * 60 * 60,
+const YAHOO_PARAMS: Record<Timeframe, { range: string; interval: string }> = {
+  "24h": { range: "1d", interval: "5m" },
+  "1w": { range: "5d", interval: "15m" },
+  "1m": { range: "1mo", interval: "1d" },
+  "6m": { range: "6mo", interval: "1d" },
+  "1y": { range: "1y", interval: "1d" },
+  "5y": { range: "5y", interval: "1wk" },
 };
-
-const TF_RESOLUTION: Record<Timeframe, string> = {
-  "24h": "15",
-  "1w": "60",
-  "1m": "D",
-  "6m": "D",
-  "1y": "D",
-  "5y": "W",
-};
-
-interface FinnhubCandle {
-  s: string;
-  t?: number[];
-  c?: number[];
-  h?: number[];
-  l?: number[];
-}
 
 interface FinnhubQuote {
   c: number;
   dp: number;
   h: number;
   l: number;
+}
+
+interface YahooChartResponse {
+  chart?: {
+    result?: Array<{
+      timestamp?: number[];
+      indicators?: {
+        quote?: Array<{
+          close?: Array<number | null>;
+        }>;
+      };
+    }>;
+    error?: unknown;
+  };
+}
+
+async function fetchYahooSeries(
+  symbol: string,
+  timeframe: Timeframe
+): Promise<CandlePoint[]> {
+  const { range, interval } = YAHOO_PARAMS[timeframe];
+  const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?range=${range}&interval=${interval}`;
+  try {
+    const res = await fetch(url, {
+      headers: {
+        // Yahoo serves an unauthenticated error to default Node user-agents.
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36",
+        Accept: "application/json,text/plain,*/*",
+      },
+    });
+    if (!res.ok) {
+      console.error("[stocks] yahoo non-2xx", symbol, res.status);
+      return [];
+    }
+    const data = (await res.json()) as YahooChartResponse;
+    const result = data.chart?.result?.[0];
+    const ts = result?.timestamp ?? [];
+    const closes = result?.indicators?.quote?.[0]?.close ?? [];
+    const points: CandlePoint[] = [];
+    for (let i = 0; i < ts.length; i++) {
+      const c = closes[i];
+      if (typeof c === "number" && !Number.isNaN(c)) {
+        points.push({ t: ts[i] * 1000, c });
+      }
+    }
+    return points;
+  } catch (e) {
+    console.error("[stocks] yahoo fetch failed", symbol, e);
+    return [];
+  }
 }
 
 export const dynamic = "force-dynamic";
@@ -45,24 +79,17 @@ export async function GET(req: NextRequest) {
   const symbol = req.nextUrl.searchParams.get("symbol");
   const label = req.nextUrl.searchParams.get("label") ?? symbol ?? "";
   const tfParam = (req.nextUrl.searchParams.get("timeframe") ?? "1m") as Timeframe;
-  const timeframe: Timeframe = tfParam in TF_SECONDS ? tfParam : "1m";
+  const timeframe: Timeframe = tfParam in YAHOO_PARAMS ? tfParam : "1m";
 
   if (!symbol) {
     return NextResponse.json({ error: "Missing symbol" }, { status: 400 });
   }
 
-  const to = Math.floor(Date.now() / 1000);
-  const from = to - TF_SECONDS[timeframe];
-  const resolution = TF_RESOLUTION[timeframe];
-  const encoded = encodeURIComponent(symbol);
-
   try {
-    const [candleRes, quoteRes] = await Promise.all([
+    const [series, quoteRes] = await Promise.all([
+      fetchYahooSeries(symbol, timeframe),
       fetch(
-        `https://finnhub.io/api/v1/stock/candle?symbol=${encoded}&resolution=${resolution}&from=${from}&to=${to}&token=${FINNHUB_KEY}`
-      ),
-      fetch(
-        `https://finnhub.io/api/v1/quote?symbol=${encoded}&token=${FINNHUB_KEY}`
+        `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_KEY}`
       ),
     ]);
 
@@ -72,16 +99,7 @@ export async function GET(req: NextRequest) {
         { status: 502 }
       );
     }
-
     const quoteRaw = (await quoteRes.json()) as FinnhubQuote;
-    const candleRaw = candleRes.ok
-      ? ((await candleRes.json()) as FinnhubCandle)
-      : { s: "no_data" };
-
-    const series: CandlePoint[] =
-      candleRaw.s === "ok" && candleRaw.t && candleRaw.c
-        ? candleRaw.t.map((t, i) => ({ t: t * 1000, c: candleRaw.c![i] }))
-        : [];
 
     const closes = series.map((p) => p.c);
     const high = closes.length ? Math.max(...closes) : quoteRaw.h;
