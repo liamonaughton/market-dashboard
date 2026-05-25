@@ -11,7 +11,6 @@ import {
   FedFundsData,
   NewsBucket,
   StockData,
-  Timeframe,
 } from "@/lib/types";
 import FuelPrices from "@/components/FuelPrices";
 import StockCharts from "@/components/StockCharts";
@@ -20,15 +19,11 @@ import NewsHeadlines from "@/components/NewsHeadlines";
 
 const STORAGE_KEY = "market-dashboard:snapshot:v2";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-const DEFAULT_TF: Timeframe = "1m";
 
 export default function DashboardPage() {
   const [snapshot, setSnapshot] = useState<DashboardSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [timeframes, setTimeframes] = useState<Record<string, Timeframe>>(() =>
-    Object.fromEntries(STOCK_SYMBOLS.map((s) => [s.symbol, DEFAULT_TF]))
-  );
 
   const loadAll = useCallback(async (): Promise<DashboardSnapshot> => {
     const stockEntries = await Promise.all(
@@ -37,7 +32,6 @@ export default function DashboardPage() {
           const params = new URLSearchParams({
             symbol: sym.symbol,
             label: sym.label,
-            timeframe: DEFAULT_TF,
           });
           const url = `/api/stocks?${params.toString()}`;
           console.log("[dashboard] fetching", url);
@@ -175,56 +169,6 @@ export default function DashboardPage() {
     };
   }, [loadAll]);
 
-  const handleTimeframeChange = useCallback(
-    async (symbol: string, tf: Timeframe) => {
-      setTimeframes((prev) => ({ ...prev, [symbol]: tf }));
-      const sym = STOCK_SYMBOLS.find((s) => s.symbol === symbol);
-      if (!sym) return;
-      try {
-        const params = new URLSearchParams({
-          symbol: sym.symbol,
-          label: sym.label,
-          timeframe: tf,
-        });
-        const url = `/api/stocks?${params.toString()}`;
-        console.log("[dashboard] fetching", url);
-        const res = await fetch(url);
-        if (!res.ok) {
-          const body = await res.text();
-          console.error("[dashboard] /api/stocks failed", symbol, res.status, body);
-          throw new Error(`/api/stocks ${res.status}`);
-        }
-        const data = (await res.json()) as StockData;
-        console.log("[dashboard] stocks ok", symbol, data.current);
-        setSnapshot((prev) => {
-          const base: DashboardSnapshot =
-            prev ?? {
-              fetchedAt: Date.now(),
-              stocks: {},
-              news: null,
-              fedFunds: null,
-              mortgage: null,
-              fuel: null,
-            };
-          const next: DashboardSnapshot = {
-            ...base,
-            stocks: { ...base.stocks, [symbol]: data },
-          };
-          persist(next);
-          return next;
-        });
-      } catch (e) {
-        console.error("[dashboard] timeframe fetch failed", e);
-        setSnapshot((prev) =>
-          prev
-            ? { ...prev, stocks: { ...prev.stocks, [symbol]: null } }
-            : prev
-        );
-      }
-    },
-    []
-  );
-
   const stocks: Record<string, StockData | null> = useMemo(
     () => snapshot?.stocks ?? {},
     [snapshot]
@@ -300,11 +244,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="mt-8">
-        <StockCharts
-          stocks={stocks}
-          onTimeframeChange={handleTimeframeChange}
-          timeframes={timeframes}
-        />
+        <StockCharts stocks={stocks} />
       </div>
 
       <div className="mt-8">

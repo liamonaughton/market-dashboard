@@ -1,6 +1,6 @@
 # Market Dashboard
 
-A single-page Next.js dashboard showing stock charts (QQQ/SPY/DIA/VTI), news, fed funds rate, mortgage rates, and fuel prices. Data refreshes once per day (tracked via `localStorage`).
+A single-page Next.js dashboard showing 1-month stock charts (QQQ/SPY/DIA/VTI), news, fed funds rate, mortgage rates, and fuel prices. Data refreshes once per day (tracked via `localStorage`).
 
 ## Setup
 
@@ -16,7 +16,7 @@ npm run dev
 All API keys are **server-side only** — they live in route handlers under `app/api/*` and are never shipped to the browser bundle.
 
 - `FINNHUB_KEY` — https://finnhub.io (used for current price + 24h change)
-- `ALPHA_VANTAGE_KEY` — https://www.alphavantage.co (used for historical price series — free tier is **25 requests/day**, so timeframe switches and refreshes are limited)
+- `ALPHA_VANTAGE_KEY` — https://www.alphavantage.co (used for 1-month daily price series — free tier is **25 requests/day**, so refreshes are limited; daily cache keeps this well under the cap in normal use)
 - `NEWSAPI_KEY` — https://newsapi.org
 - `FRED_KEY` — https://fred.stlouisfed.org/docs/api/api_key.html
 

@@ -1,5 +1,3 @@
-export type Timeframe = "24h" | "1w" | "1m" | "6m" | "1y" | "5y";
-
 export interface StockSymbol {
   symbol: string;
   label: string;

@@ -1,63 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { CandlePoint, StockData, Timeframe } from "@/lib/types";
+import { CandlePoint, StockData } from "@/lib/types";
 
 const FINNHUB_KEY = process.env.FINNHUB_KEY ?? "";
 const ALPHA_VANTAGE_KEY = process.env.ALPHA_VANTAGE_KEY ?? "";
 
-interface AVConfig {
-  function: string;
-  seriesKey: string;
-  intraday: boolean;
-  extra: Record<string, string>;
-}
-
-const AV_CONFIG: Record<Timeframe, AVConfig> = {
-  "24h": {
-    function: "TIME_SERIES_INTRADAY",
-    seriesKey: "Time Series (60min)",
-    intraday: true,
-    extra: { interval: "60min" },
-  },
-  "1w": {
-    function: "TIME_SERIES_INTRADAY",
-    seriesKey: "Time Series (60min)",
-    intraday: true,
-    extra: { interval: "60min" },
-  },
-  "1m": {
-    function: "TIME_SERIES_DAILY",
-    seriesKey: "Time Series (Daily)",
-    intraday: false,
-    extra: { outputsize: "compact" },
-  },
-  "6m": {
-    function: "TIME_SERIES_DAILY",
-    seriesKey: "Time Series (Daily)",
-    intraday: false,
-    extra: { outputsize: "compact" },
-  },
-  "1y": {
-    function: "TIME_SERIES_DAILY",
-    seriesKey: "Time Series (Daily)",
-    intraday: false,
-    extra: { outputsize: "full" },
-  },
-  "5y": {
-    function: "TIME_SERIES_WEEKLY",
-    seriesKey: "Weekly Time Series",
-    intraday: false,
-    extra: {},
-  },
-};
-
-const TF_WINDOW_MS: Record<Timeframe, number> = {
-  "24h": 24 * 60 * 60 * 1000,
-  "1w": 7 * 24 * 60 * 60 * 1000,
-  "1m": 31 * 24 * 60 * 60 * 1000,
-  "6m": 183 * 24 * 60 * 60 * 1000,
-  "1y": 366 * 24 * 60 * 60 * 1000,
-  "5y": 5 * 366 * 24 * 60 * 60 * 1000,
-};
+const WINDOW_MS = 31 * 24 * 60 * 60 * 1000;
 
 interface FinnhubQuote {
   c: number;
@@ -72,33 +19,19 @@ interface AVResponse {
   Information?: string;
   Note?: string;
   "Error Message"?: string;
-  [key: string]: unknown;
+  "Time Series (Daily)"?: Record<string, AVBar>;
 }
 
-function parseTimestamp(key: string, intraday: boolean): number {
-  // Intraday keys arrive as "YYYY-MM-DD HH:MM:SS" in US/Eastern. We approximate
-  // them by reading the wall clock as UTC; absolute timestamps shift by the ET
-  // offset but the chart's relative ordering and spacing is preserved.
-  if (intraday) {
-    return new Date(key.replace(" ", "T") + "Z").getTime();
-  }
-  return new Date(key).getTime();
-}
-
-async function fetchAlphaVantageSeries(
-  symbol: string,
-  timeframe: Timeframe
-): Promise<CandlePoint[]> {
+async function fetchAlphaVantageSeries(symbol: string): Promise<CandlePoint[]> {
   if (!ALPHA_VANTAGE_KEY) {
     console.warn("[stocks] Missing ALPHA_VANTAGE_KEY; skipping series");
     return [];
   }
-  const cfg = AV_CONFIG[timeframe];
   const params = new URLSearchParams({
-    function: cfg.function,
+    function: "TIME_SERIES_DAILY",
     symbol,
+    outputsize: "compact",
     apikey: ALPHA_VANTAGE_KEY,
-    ...cfg.extra,
   });
   const url = `https://www.alphavantage.co/query?${params.toString()}`;
   try {
@@ -120,20 +53,15 @@ async function fetchAlphaVantageSeries(
       console.error("[stocks] alpha vantage error", symbol, data["Error Message"]);
       return [];
     }
-    const seriesObj = data[cfg.seriesKey] as Record<string, AVBar> | undefined;
+    const seriesObj = data["Time Series (Daily)"];
     if (!seriesObj) {
-      console.warn(
-        "[stocks] alpha vantage missing series key",
-        symbol,
-        cfg.seriesKey,
-        Object.keys(data)
-      );
+      console.warn("[stocks] alpha vantage missing daily series", symbol);
       return [];
     }
-    const cutoff = Date.now() - TF_WINDOW_MS[timeframe];
+    const cutoff = Date.now() - WINDOW_MS;
     const points: CandlePoint[] = [];
     for (const [key, bar] of Object.entries(seriesObj)) {
-      const t = parseTimestamp(key, cfg.intraday);
+      const t = new Date(key).getTime();
       if (Number.isNaN(t) || t < cutoff) continue;
       const closeStr = bar["4. close"];
       const c = closeStr != null ? Number(closeStr) : NaN;
@@ -156,8 +84,6 @@ export async function GET(req: NextRequest) {
   }
   const symbol = req.nextUrl.searchParams.get("symbol");
   const label = req.nextUrl.searchParams.get("label") ?? symbol ?? "";
-  const tfParam = (req.nextUrl.searchParams.get("timeframe") ?? "1m") as Timeframe;
-  const timeframe: Timeframe = tfParam in AV_CONFIG ? tfParam : "1m";
 
   if (!symbol) {
     return NextResponse.json({ error: "Missing symbol" }, { status: 400 });
@@ -165,7 +91,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const [series, quoteRes] = await Promise.all([
-      fetchAlphaVantageSeries(symbol, timeframe),
+      fetchAlphaVantageSeries(symbol),
       fetch(
         `https://finnhub.io/api/v1/quote?symbol=${encodeURIComponent(symbol)}&token=${FINNHUB_KEY}`
       ),

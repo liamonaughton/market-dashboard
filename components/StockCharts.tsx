@@ -9,23 +9,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import { StockData, StockSymbol, Timeframe } from "@/lib/types";
+import { StockData, StockSymbol } from "@/lib/types";
 import { STOCK_SYMBOLS } from "@/lib/api";
 import Card from "./Card";
 
-const TIMEFRAMES: Timeframe[] = ["24h", "1w", "1m", "6m", "1y", "5y"];
-
 interface StockChartsProps {
   stocks: Record<string, StockData | null>;
-  onTimeframeChange: (symbol: string, tf: Timeframe) => void;
-  timeframes: Record<string, Timeframe>;
 }
 
-export default function StockCharts({
-  stocks,
-  onTimeframeChange,
-  timeframes,
-}: StockChartsProps) {
+export default function StockCharts({ stocks }: StockChartsProps) {
   return (
     <section>
       <h2 className="mb-4 text-sm font-medium uppercase tracking-wide text-muted">
@@ -37,8 +29,6 @@ export default function StockCharts({
             key={sym.symbol}
             sym={sym}
             data={stocks[sym.symbol] ?? null}
-            timeframe={timeframes[sym.symbol] ?? "1m"}
-            onTimeframeChange={(tf) => onTimeframeChange(sym.symbol, tf)}
           />
         ))}
       </div>
@@ -49,28 +39,15 @@ export default function StockCharts({
 interface StockChartCardProps {
   sym: StockSymbol;
   data: StockData | null;
-  timeframe: Timeframe;
-  onTimeframeChange: (tf: Timeframe) => void;
 }
 
-function StockChartCard({
-  sym,
-  data,
-  timeframe,
-  onTimeframeChange,
-}: StockChartCardProps) {
+function StockChartCard({ sym, data }: StockChartCardProps) {
   const [hovered, setHovered] = useState(false);
   const positive = data ? data.changePct24h >= 0 : true;
   const color = positive ? "#10b981" : "#ef4444";
 
   return (
-    <Card
-      title={sym.label}
-      subtitle={sym.symbol}
-      right={
-        <TimeframeButtons selected={timeframe} onChange={onTimeframeChange} />
-      }
-    >
+    <Card title={sym.label} subtitle={`${sym.symbol} · last 1 month`}>
       {data ? (
         <>
           <div className="flex items-baseline justify-between">
@@ -81,10 +58,7 @@ function StockChartCard({
                   maximumFractionDigits: 2,
                 })}
               </p>
-              <p
-                className="mt-1 font-mono text-sm"
-                style={{ color }}
-              >
+              <p className="mt-1 font-mono text-sm" style={{ color }}>
                 {positive ? "+" : ""}
                 {data.changePct24h.toFixed(2)}% (24h)
               </p>
@@ -136,7 +110,7 @@ function StockChartCard({
               </ResponsiveContainer>
             ) : (
               <div className="flex h-full items-center justify-center text-xs text-muted">
-                No chart data for this range
+                No chart data
               </div>
             )}
           </div>
@@ -145,33 +119,6 @@ function StockChartCard({
         <p className="text-sm text-muted">Data unavailable</p>
       )}
     </Card>
-  );
-}
-
-function TimeframeButtons({
-  selected,
-  onChange,
-}: {
-  selected: Timeframe;
-  onChange: (tf: Timeframe) => void;
-}) {
-  return (
-    <div className="flex flex-wrap gap-1">
-      {TIMEFRAMES.map((tf) => (
-        <button
-          key={tf}
-          type="button"
-          onClick={() => onChange(tf)}
-          className={`rounded-md px-2 py-1 text-[11px] font-medium uppercase tracking-wide transition ${
-            selected === tf
-              ? "bg-accent text-white"
-              : "bg-surface-elevated text-muted hover:text-white"
-          }`}
-        >
-          {tf}
-        </button>
-      ))}
-    </div>
   );
 }
 
