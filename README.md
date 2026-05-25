@@ -15,11 +15,12 @@ npm run dev
 
 All API keys are **server-side only** — they live in route handlers under `app/api/*` and are never shipped to the browser bundle.
 
-- `FINNHUB_KEY` — https://finnhub.io
+- `FINNHUB_KEY` — https://finnhub.io (used for current price + 24h change)
+- `ALPHA_VANTAGE_KEY` — https://www.alphavantage.co (used for historical price series — free tier is **25 requests/day**, so timeframe switches and refreshes are limited)
 - `NEWSAPI_KEY` — https://newsapi.org
 - `FRED_KEY` — https://fred.stlouisfed.org/docs/api/api_key.html
 
-The client calls internal routes (`/api/stocks`, `/api/news`, `/api/fed`); those routes call the upstream APIs with the secret keys.
+The client calls internal routes (`/api/stocks`, `/api/news`, `/api/fed`); those routes call the upstream APIs with the secret keys. When Alpha Vantage rate-limits, the chart shows "No chart data for this range" while the quote still renders.
 
 Fuel prices (100LL, Jet A) and mortgage rates (30yr FHA & Conv) use mock data — swap in real APIs in `lib/api.ts` (or move them to API routes too if they need secret keys).
 
@@ -36,7 +37,7 @@ Finnhub doesn't support the bare index tickers (`^NDX`, `^GSPC`, `^DJI`) on the 
 
 ## Deploy
 
-Push to GitHub and import into Vercel. In the Vercel project settings, add three env vars: `FINNHUB_KEY`, `NEWSAPI_KEY`, `FRED_KEY` (no `NEXT_PUBLIC_` prefix).
+Push to GitHub and import into Vercel. In the Vercel project settings, add four env vars: `FINNHUB_KEY`, `ALPHA_VANTAGE_KEY`, `NEWSAPI_KEY`, `FRED_KEY` (no `NEXT_PUBLIC_` prefix).
 
 ## Notes
 
