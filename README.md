@@ -1,6 +1,6 @@
 # Market Dashboard
 
-A single-page Next.js dashboard showing stock charts, news, fed funds rate, mortgage rates, and fuel prices. Data refreshes once per day (tracked via `localStorage`).
+A single-page Next.js dashboard showing stock charts (QQQ/SPY/DIA/VTI), news, fed funds rate, mortgage rates, and fuel prices. Data refreshes once per day (tracked via `localStorage`).
 
 ## Setup
 
@@ -13,17 +13,31 @@ npm run dev
 
 ## API Keys
 
-- `NEXT_PUBLIC_FINNHUB_KEY` — https://finnhub.io
-- `NEXT_PUBLIC_NEWSAPI_KEY` — https://newsapi.org
-- `NEXT_PUBLIC_FRED_KEY` — https://fred.stlouisfed.org/docs/api/api_key.html
+All API keys are **server-side only** — they live in route handlers under `app/api/*` and are never shipped to the browser bundle.
 
-Fuel prices (100LL, Jet A) and mortgage rates (30yr FHA & Conv) use mock data — swap in real APIs in `lib/api.ts`.
+- `FINNHUB_KEY` — https://finnhub.io
+- `NEWSAPI_KEY` — https://newsapi.org
+- `FRED_KEY` — https://fred.stlouisfed.org/docs/api/api_key.html
+
+The client calls internal routes (`/api/stocks`, `/api/news`, `/api/fed`); those routes call the upstream APIs with the secret keys.
+
+Fuel prices (100LL, Jet A) and mortgage rates (30yr FHA & Conv) use mock data — swap in real APIs in `lib/api.ts` (or move them to API routes too if they need secret keys).
+
+## Symbols
+
+Finnhub doesn't support the bare index tickers (`^NDX`, `^GSPC`, `^DJI`) on the free plan, so the dashboard tracks tracking-ETFs instead:
+
+| Label | Symbol |
+| --- | --- |
+| NASDAQ 100 | QQQ |
+| S&P 500 | SPY |
+| DOW | DIA |
+| VTI | VTI |
 
 ## Deploy
 
-Push to GitHub and import into Vercel. Set the three `NEXT_PUBLIC_*` env vars in the Vercel project settings.
+Push to GitHub and import into Vercel. In the Vercel project settings, add three env vars: `FINNHUB_KEY`, `NEWSAPI_KEY`, `FRED_KEY` (no `NEXT_PUBLIC_` prefix).
 
 ## Notes
 
-- NewsAPI's developer plan blocks browser requests in production. For deployed builds, proxy NewsAPI through a server route or upgrade your plan.
 - `npm audit` reports a few Next 14 advisories (Image Optimizer remotePatterns, RSC request handling, rewrites, `next/image` cache). This app uses none of those features, so the advisories don't affect it. To clear the audit anyway, upgrade to Next 15 — note that 15 requires React 19.
