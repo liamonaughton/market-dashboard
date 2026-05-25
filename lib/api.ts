@@ -1,12 +1,8 @@
 import {
-  FedFundsData,
   FuelPriceData,
   MortgageRateData,
-  NewsBucket,
   RatePoint,
-  StockData,
   StockSymbol,
-  Timeframe,
 } from "./types";
 
 export const STOCK_SYMBOLS: StockSymbol[] = [
@@ -15,34 +11,6 @@ export const STOCK_SYMBOLS: StockSymbol[] = [
   { symbol: "DIA", label: "DOW" },
   { symbol: "VTI", label: "VTI" },
 ];
-
-async function getJson<T>(url: string): Promise<T> {
-  const res = await fetch(url);
-  if (!res.ok) {
-    throw new Error(`Request failed (${res.status}): ${url}`);
-  }
-  return res.json() as Promise<T>;
-}
-
-export async function fetchStock(
-  symbol: StockSymbol,
-  timeframe: Timeframe
-): Promise<StockData> {
-  const params = new URLSearchParams({
-    symbol: symbol.symbol,
-    label: symbol.label,
-    timeframe,
-  });
-  return getJson<StockData>(`/api/stocks?${params.toString()}`);
-}
-
-export async function fetchNews(): Promise<NewsBucket> {
-  return getJson<NewsBucket>("/api/news");
-}
-
-export async function fetchFedFunds(): Promise<FedFundsData> {
-  return getJson<FedFundsData>("/api/fed");
-}
 
 export async function fetchMortgageRates(): Promise<MortgageRateData> {
   const today = new Date();

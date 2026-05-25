@@ -3,14 +3,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   STOCK_SYMBOLS,
-  fetchFedFunds,
   fetchFuelPrices,
   fetchMortgageRates,
-  fetchNews,
-  fetchStock,
 } from "@/lib/api";
 import {
   DashboardSnapshot,
+  FedFundsData,
+  NewsBucket,
   StockData,
   Timeframe,
 } from "@/lib/types";
@@ -35,7 +34,14 @@ export default function DashboardPage() {
     const stockEntries = await Promise.all(
       STOCK_SYMBOLS.map(async (sym) => {
         try {
-          const data = await fetchStock(sym, DEFAULT_TF);
+          const params = new URLSearchParams({
+            symbol: sym.symbol,
+            label: sym.label,
+            timeframe: DEFAULT_TF,
+          });
+          const res = await fetch(`/api/stocks?${params.toString()}`);
+          if (!res.ok) throw new Error(`/api/stocks ${res.status}`);
+          const data = (await res.json()) as StockData;
           return [sym.symbol, data] as const;
         } catch (e) {
           console.error("stock fetch failed", sym.symbol, e);
@@ -45,14 +51,26 @@ export default function DashboardPage() {
     );
 
     const [news, fedFunds, mortgage, fuel] = await Promise.all([
-      fetchNews().catch((e) => {
-        console.error("news fetch failed", e);
-        return null;
-      }),
-      fetchFedFunds().catch((e) => {
-        console.error("fed funds fetch failed", e);
-        return null;
-      }),
+      (async () => {
+        try {
+          const res = await fetch("/api/news");
+          if (!res.ok) throw new Error(`/api/news ${res.status}`);
+          return (await res.json()) as NewsBucket;
+        } catch (e) {
+          console.error("news fetch failed", e);
+          return null;
+        }
+      })(),
+      (async () => {
+        try {
+          const res = await fetch("/api/fed");
+          if (!res.ok) throw new Error(`/api/fed ${res.status}`);
+          return (await res.json()) as FedFundsData;
+        } catch (e) {
+          console.error("fed funds fetch failed", e);
+          return null;
+        }
+      })(),
       fetchMortgageRates().catch((e) => {
         console.error("mortgage fetch failed", e);
         return null;
@@ -138,7 +156,14 @@ export default function DashboardPage() {
       const sym = STOCK_SYMBOLS.find((s) => s.symbol === symbol);
       if (!sym) return;
       try {
-        const data = await fetchStock(sym, tf);
+        const params = new URLSearchParams({
+          symbol: sym.symbol,
+          label: sym.label,
+          timeframe: tf,
+        });
+        const res = await fetch(`/api/stocks?${params.toString()}`);
+        if (!res.ok) throw new Error(`/api/stocks ${res.status}`);
+        const data = (await res.json()) as StockData;
         setSnapshot((prev) => {
           const base: DashboardSnapshot =
             prev ?? {
