@@ -18,7 +18,7 @@ import StockCharts from "@/components/StockCharts";
 import RateCard from "@/components/RateCard";
 import NewsHeadlines from "@/components/NewsHeadlines";
 
-const STORAGE_KEY = "market-dashboard:snapshot:v1";
+const STORAGE_KEY = "market-dashboard:snapshot:v2";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_TF: Timeframe = "1m";
 
@@ -39,12 +39,19 @@ export default function DashboardPage() {
             label: sym.label,
             timeframe: DEFAULT_TF,
           });
-          const res = await fetch(`/api/stocks?${params.toString()}`);
-          if (!res.ok) throw new Error(`/api/stocks ${res.status}`);
+          const url = `/api/stocks?${params.toString()}`;
+          console.log("[dashboard] fetching", url);
+          const res = await fetch(url);
+          if (!res.ok) {
+            const body = await res.text();
+            console.error("[dashboard] /api/stocks failed", sym.symbol, res.status, body);
+            throw new Error(`/api/stocks ${res.status}`);
+          }
           const data = (await res.json()) as StockData;
+          console.log("[dashboard] stocks ok", sym.symbol, data.current);
           return [sym.symbol, data] as const;
         } catch (e) {
-          console.error("stock fetch failed", sym.symbol, e);
+          console.error("[dashboard] stock fetch failed", sym.symbol, e);
           return [sym.symbol, null] as const;
         }
       })
@@ -53,30 +60,48 @@ export default function DashboardPage() {
     const [news, fedFunds, mortgage, fuel] = await Promise.all([
       (async () => {
         try {
+          console.log("[dashboard] fetching /api/news");
           const res = await fetch("/api/news");
-          if (!res.ok) throw new Error(`/api/news ${res.status}`);
-          return (await res.json()) as NewsBucket;
+          if (!res.ok) {
+            const body = await res.text();
+            console.error("[dashboard] /api/news failed", res.status, body);
+            throw new Error(`/api/news ${res.status}`);
+          }
+          const data = (await res.json()) as NewsBucket;
+          console.log(
+            "[dashboard] news ok",
+            data.past24h?.length ?? 0,
+            data.pastWeek?.length ?? 0
+          );
+          return data;
         } catch (e) {
-          console.error("news fetch failed", e);
+          console.error("[dashboard] news fetch failed", e);
           return null;
         }
       })(),
       (async () => {
         try {
+          console.log("[dashboard] fetching /api/fed");
           const res = await fetch("/api/fed");
-          if (!res.ok) throw new Error(`/api/fed ${res.status}`);
-          return (await res.json()) as FedFundsData;
+          if (!res.ok) {
+            const body = await res.text();
+            console.error("[dashboard] /api/fed failed", res.status, body);
+            throw new Error(`/api/fed ${res.status}`);
+          }
+          const data = (await res.json()) as FedFundsData;
+          console.log("[dashboard] fed ok", data.current);
+          return data;
         } catch (e) {
-          console.error("fed funds fetch failed", e);
+          console.error("[dashboard] fed funds fetch failed", e);
           return null;
         }
       })(),
       fetchMortgageRates().catch((e) => {
-        console.error("mortgage fetch failed", e);
+        console.error("[dashboard] mortgage fetch failed", e);
         return null;
       }),
       fetchFuelPrices().catch((e) => {
-        console.error("fuel fetch failed", e);
+        console.error("[dashboard] fuel fetch failed", e);
         return null;
       }),
     ]);
@@ -161,9 +186,16 @@ export default function DashboardPage() {
           label: sym.label,
           timeframe: tf,
         });
-        const res = await fetch(`/api/stocks?${params.toString()}`);
-        if (!res.ok) throw new Error(`/api/stocks ${res.status}`);
+        const url = `/api/stocks?${params.toString()}`;
+        console.log("[dashboard] fetching", url);
+        const res = await fetch(url);
+        if (!res.ok) {
+          const body = await res.text();
+          console.error("[dashboard] /api/stocks failed", symbol, res.status, body);
+          throw new Error(`/api/stocks ${res.status}`);
+        }
         const data = (await res.json()) as StockData;
+        console.log("[dashboard] stocks ok", symbol, data.current);
         setSnapshot((prev) => {
           const base: DashboardSnapshot =
             prev ?? {
@@ -182,7 +214,7 @@ export default function DashboardPage() {
           return next;
         });
       } catch (e) {
-        console.error("timeframe fetch failed", e);
+        console.error("[dashboard] timeframe fetch failed", e);
         setSnapshot((prev) =>
           prev
             ? { ...prev, stocks: { ...prev.stocks, [symbol]: null } }
