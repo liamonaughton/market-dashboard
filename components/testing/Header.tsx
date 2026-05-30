@@ -1,5 +1,6 @@
-// PLACEHOLDER: swap the text logo for an <Image> tag once the real asset is available.
+// PLACEHOLDER: logo is hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
 import Link from "next/link";
+import { ASSETS } from "./cdn";
 
 const NAV_LINKS = [
   { href: "#aircraft", label: "Aircraft" },
@@ -11,11 +12,9 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-white/5 bg-black/70 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <Link
-          href="#top"
-          className="font-display text-xl tracking-[0.35em] text-white"
-        >
-          ELEVEN <span className="text-gold">AVIATION</span>
+        <Link href="#top" aria-label="Eleven Aviation home" className="block">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ASSETS.logo} alt="Eleven Aviation" className="h-8 w-auto" />
         </Link>
 
         <nav className="hidden items-center gap-10 md:flex">

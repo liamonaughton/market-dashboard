@@ -1,18 +1,24 @@
-// PLACEHOLDER: drop a real hero photo/video at /public/testing/hero.jpg and reference it via the background-image style below.
+// PLACEHOLDER: video + arrow are hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
+import { ASSETS } from "./cdn";
+
 export default function Hero() {
   return (
     <section
       id="top"
       className="relative flex min-h-[88vh] items-center justify-center overflow-hidden bg-black"
     >
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            "radial-gradient(ellipse at center, rgba(40,52,80,0.7) 0%, rgba(0,0,0,0.95) 65%, #000 100%)",
-        }}
-      />
-      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/90" />
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 h-full w-full object-cover"
+        poster=""
+      >
+        <source src={ASSETS.heroVideo} type="video/mp4" />
+      </video>
+
+      <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/80" />
 
       <div className="relative z-10 mx-auto max-w-5xl px-6 text-center">
         <p className="mb-6 text-[10px] uppercase tracking-[0.5em] text-gold">
@@ -28,19 +34,14 @@ export default function Hero() {
       <a
         href="#elevated"
         aria-label="Scroll down"
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/60 transition hover:text-white"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white/70 transition hover:text-white"
       >
-        <svg
-          width="28"
-          height="28"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          className="animate-bounce"
-        >
-          <path d="M12 4v16M5 13l7 7 7-7" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={ASSETS.downArrow}
+          alt=""
+          className="h-8 w-8 animate-bounce"
+        />
       </a>
     </section>
   );

@@ -1,39 +1,27 @@
-// PLACEHOLDER: replace each SVG block with finalized brand iconography when ready.
+// PLACEHOLDER: icons are hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
+import { ASSETS } from "./cdn";
+
 interface Feature {
   title: string;
   body: string;
-  icon: JSX.Element;
+  icon: string;
 }
 
 const FEATURES: Feature[] = [
   {
     title: "Effortless Travel",
     body: "From first call to final arrival, every detail is anticipated and handled with discretion.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-        <path d="M2 12l20-8-5 20-4-9-11-3z" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: ASSETS.icons.feather,
   },
   {
     title: "Pricing Transparency",
     body: "Clear, honest pricing with no hidden surcharges — the quote you see is the quote you fly.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-        <circle cx="12" cy="12" r="9" />
-        <path d="M12 7v10M9 10h6M9 14h6" strokeLinecap="round" />
-      </svg>
-    ),
+    icon: ASSETS.icons.eyeDollar,
   },
   {
     title: "Safety & Maintenance",
     body: "Industry-leading safety standards backed by an in-house maintenance program and ARGUS-rated operators.",
-    icon: (
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2">
-        <path d="M12 2l8 4v6c0 5-3.5 9-8 10-4.5-1-8-5-8-10V6l8-4z" strokeLinejoin="round" />
-        <path d="M9 12l2 2 4-4" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
-    ),
+    icon: ASSETS.icons.shieldPlus,
   },
 ];
 
@@ -60,7 +48,8 @@ export default function ElevatedExperiences() {
               key={f.title}
               className="group border border-white/10 bg-white/[0.02] p-8 transition hover:border-gold/60"
             >
-              <div className="h-10 w-10 text-gold">{f.icon}</div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={f.icon} alt="" className="h-10 w-10" />
               <h3 className="mt-6 font-display text-2xl text-white">
                 {f.title}
               </h3>

@@ -1,3 +1,6 @@
+// PLACEHOLDER: logo is hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
+import { ASSETS } from "./cdn";
+
 const NAV_LINKS = [
   { href: "#aircraft", label: "Aircraft" },
   { href: "#management", label: "Management" },
@@ -9,9 +12,8 @@ export default function Footer() {
     <footer className="border-t border-white/10 bg-black py-16">
       <div className="mx-auto grid max-w-7xl gap-12 px-6 md:grid-cols-3">
         <div>
-          <p className="font-display text-lg tracking-[0.35em] text-white">
-            ELEVEN <span className="text-gold">AVIATION</span>
-          </p>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={ASSETS.logo} alt="Eleven Aviation" className="h-8 w-auto" />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-white/50">
             Private charter, aircraft management, and acquisitions — delivered
             with the discretion the journey deserves.
