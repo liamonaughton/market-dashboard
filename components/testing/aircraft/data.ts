@@ -1,10 +1,22 @@
-import { ASSETS } from "../cdn";
+import { ASSETS, CDN } from "../cdn";
 
 export interface AircraftStats {
   flightHours: string;
   nauticalMiles: string;
   passengers: string;
   luggage: string;
+}
+
+export interface KV {
+  label: string;
+  value: string;
+}
+
+export interface AircraftTabContent {
+  interior?: { images: string[] };
+  performance?: { images: string[]; specs: KV[] };
+  layout?: { images: string[]; dimensions?: KV[] };
+  amenities?: string[];
 }
 
 export interface Aircraft {
@@ -15,7 +27,22 @@ export interface Aircraft {
   pdf: string;
   description: string;
   stats: AircraftStats;
+  gallery?: string[];
+  tabs?: AircraftTabContent;
 }
+
+const N224MZ_DIR = `${CDN}/images/N224MZ/Downscaled`;
+const N224MZ_GALLERY = [
+  `${N224MZ_DIR}/DSC06607-2.jpg`,
+  `${N224MZ_DIR}/DSC06265-2.jpg`,
+  `${N224MZ_DIR}/DSC06296-2.jpg`,
+  `${N224MZ_DIR}/DSC06201-2.jpg`,
+  `${N224MZ_DIR}/DSC06224-2.jpg`,
+  `${N224MZ_DIR}/DSC06287-2.jpg`,
+  `${N224MZ_DIR}/DSC06290-2.jpg`,
+  `${N224MZ_DIR}/DSC06312-2.jpg`,
+  `${N224MZ_DIR}/DSC06549-2.jpg`,
+];
 
 export const AIRCRAFT: Aircraft[] = [
   {
@@ -46,6 +73,49 @@ export const AIRCRAFT: Aircraft[] = [
       nauticalMiles: "2,700 nm",
       passengers: "9",
       luggage: "20",
+    },
+    gallery: N224MZ_GALLERY,
+    tabs: {
+      interior: {
+        images: [
+          `${N224MZ_DIR}/DSC06265-2.jpg`,
+          `${N224MZ_DIR}/DSC06296-2.jpg`,
+          `${N224MZ_DIR}/DSC06287-2.jpg`,
+          `${N224MZ_DIR}/DSC06290-2.jpg`,
+        ],
+      },
+      performance: {
+        images: [
+          `${N224MZ_DIR}/DSC06549-2.jpg`,
+          `${N224MZ_DIR}/DSC06201-2.jpg`,
+        ],
+        specs: [
+          { label: "Max Range", value: "2,700 nm" },
+          { label: "Max Speed", value: "470 ktas" },
+          { label: "Max Altitude", value: "45,000 ft" },
+          { label: "Takeoff Distance", value: "5,700 ft" },
+        ],
+      },
+      layout: {
+        images: [
+          `${N224MZ_DIR}/DSC06224-2.jpg`,
+          `${N224MZ_DIR}/DSC06312-2.jpg`,
+        ],
+        dimensions: [
+          { label: "Cabin Length", value: "24 ft 5 in" },
+          { label: "Cabin Width", value: "7 ft 2 in" },
+          { label: "Cabin Height", value: "6 ft 3 in" },
+          { label: "Cabin Volume", value: "868 cu ft" },
+        ],
+      },
+      amenities: [
+        "Wi-Fi connectivity",
+        "Refreshment center",
+        "Power outlets at every seat",
+        "Enclosed lavatory",
+        "Baggage compartment accessible in flight",
+        "Climate-controlled cabin",
+      ],
     },
   },
   {

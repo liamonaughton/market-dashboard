@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
-import { Aircraft } from "./data";
+import { Aircraft, KV } from "./data";
 
 const TABS = ["Overview", "Performance", "Interior", "Layout", "Amenities"] as const;
 type Tab = (typeof TABS)[number];
@@ -52,14 +53,41 @@ export default function AircraftTabs({ aircraft }: TabsProps) {
       </div>
 
       <div className="mx-auto max-w-7xl px-6 py-16">
-        {active === "Overview" ? (
-          <Overview aircraft={aircraft} />
-        ) : (
-          <ComingSoon tab={active} />
-        )}
+        {renderTab(active, aircraft)}
       </div>
     </section>
   );
+}
+
+function renderTab(tab: Tab, aircraft: Aircraft) {
+  switch (tab) {
+    case "Overview":
+      return <Overview aircraft={aircraft} />;
+    case "Performance": {
+      const p = aircraft.tabs?.performance;
+      return p ? (
+        <Performance aircraft={aircraft} data={p} />
+      ) : (
+        <ComingSoon tab="Performance" />
+      );
+    }
+    case "Interior": {
+      const i = aircraft.tabs?.interior;
+      return i ? (
+        <Gallery title="Inside the cabin" images={i.images} />
+      ) : (
+        <ComingSoon tab="Interior" />
+      );
+    }
+    case "Layout": {
+      const l = aircraft.tabs?.layout;
+      return l ? <Layout data={l} /> : <ComingSoon tab="Layout" />;
+    }
+    case "Amenities": {
+      const a = aircraft.tabs?.amenities;
+      return a ? <Amenities items={a} /> : <ComingSoon tab="Amenities" />;
+    }
+  }
 }
 
 function Overview({ aircraft }: { aircraft: Aircraft }) {
@@ -104,7 +132,7 @@ function Overview({ aircraft }: { aircraft: Aircraft }) {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string }) {
+function Stat({ label, value }: KV) {
   return (
     <div className="border border-neutral-200 bg-white p-5 text-center shadow-sm">
       <p className="font-display text-2xl text-neutral-900 sm:text-3xl">
@@ -113,6 +141,108 @@ function Stat({ label, value }: { label: string; value: string }) {
       <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-gold">
         {label}
       </p>
+    </div>
+  );
+}
+
+function Performance({
+  aircraft,
+  data,
+}: {
+  aircraft: Aircraft;
+  data: NonNullable<Aircraft["tabs"]>["performance"];
+}) {
+  if (!data) return null;
+  return (
+    <div className="space-y-12">
+      <div className="grid gap-6 sm:grid-cols-2">
+        {data.images.map((src, i) => (
+          <PhotoTile key={src} src={src} alt={`${aircraft.name} ${i + 1}`} />
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        {data.specs.map((s) => (
+          <Stat key={s.label} {...s} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Gallery({ title, images }: { title: string; images: string[] }) {
+  return (
+    <div>
+      <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl">
+        {title}
+      </h2>
+      <div className="mt-8 grid gap-6 md:grid-cols-2">
+        {images.map((src, i) => (
+          <PhotoTile key={src} src={src} alt={`${title} ${i + 1}`} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function Layout({
+  data,
+}: {
+  data: NonNullable<NonNullable<Aircraft["tabs"]>["layout"]>;
+}) {
+  return (
+    <div className="space-y-12">
+      <div className="grid gap-6 md:grid-cols-2">
+        {data.images.map((src, i) => (
+          <PhotoTile key={src} src={src} alt={`Cabin layout ${i + 1}`} />
+        ))}
+      </div>
+      {data.dimensions && data.dimensions.length > 0 ? (
+        <div>
+          <h3 className="font-display text-2xl text-neutral-900">
+            Cabin Dimensions
+          </h3>
+          <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {data.dimensions.map((d) => (
+              <Stat key={d.label} {...d} />
+            ))}
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function Amenities({ items }: { items: string[] }) {
+  return (
+    <div>
+      <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl">
+        Onboard
+      </h2>
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {items.map((a) => (
+          <li
+            key={a}
+            className="flex items-start gap-3 border border-neutral-200 bg-white p-5 shadow-sm"
+          >
+            <span className="mt-1 inline-block h-2 w-2 shrink-0 rounded-full bg-gold" />
+            <span className="text-sm leading-relaxed text-neutral-800">{a}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function PhotoTile({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="group relative aspect-[4/3] overflow-hidden rounded-md bg-neutral-100 shadow-sm transition hover:shadow-md">
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        sizes="(min-width: 768px) 50vw, 100vw"
+        className="object-cover transition duration-700 group-hover:scale-105"
+      />
     </div>
   );
 }
