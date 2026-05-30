@@ -1,6 +1,8 @@
 // PLACEHOLDER: aircraft photos are hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
 import Image from "next/image";
+import Link from "next/link";
 import { ASSETS } from "./cdn";
+import { TAIL_TO_SLUG } from "./aircraft/data";
 
 interface Aircraft {
   tail: string;
@@ -77,17 +79,18 @@ export default function Fleet() {
         <div className="mt-12 -mx-6 overflow-x-auto px-6 pb-4">
           <div className="flex gap-6">
             {FLEET.map((a) => (
-              <article
+              <Link
                 key={a.tail}
-                className="w-[320px] shrink-0 overflow-hidden border border-neutral-200 bg-white shadow-sm transition hover:border-gold/50 hover:shadow-md sm:w-[360px]"
+                href={`/testing/aircraft/${TAIL_TO_SLUG[a.tail]}`}
+                className="group w-[320px] shrink-0 overflow-hidden border border-neutral-200 bg-white shadow-sm transition hover:border-gold/50 hover:shadow-md sm:w-[360px]"
               >
-                <div className="relative h-56 w-full bg-neutral-100">
+                <div className="relative h-56 w-full overflow-hidden bg-neutral-100">
                   <Image
                     src={ASSETS.fleet[a.tail]}
                     alt={`${a.type} (${a.tail})`}
                     fill
                     sizes="(min-width: 640px) 360px, 320px"
-                    className="object-cover"
+                    className="object-cover transition duration-700 group-hover:scale-105"
                   />
                 </div>
                 <div className="p-6">
@@ -107,7 +110,7 @@ export default function Fleet() {
                     <Spec label="Luggage" value={a.luggage} />
                   </dl>
                 </div>
-              </article>
+              </Link>
             ))}
           </div>
         </div>

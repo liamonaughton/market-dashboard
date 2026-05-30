@@ -40,4 +40,10 @@ export const ASSETS = {
     N11HM: `${CDN}/images/N11HM/Downscaled/DSC00511.jpg`,
     N523JG: `${CDN}/images/N523JG/Downscaled/DSC06479-2.jpg`,
   } as Record<string, string>,
+  pdfs: {
+    N11CP: `${CDN}/images/PDFs/elevenaviation_citationXL_spec.pdf`,
+    N224MZ: `${CDN}/images/PDFs/MZ-specSheet.pdf`,
+    N11HM: `${CDN}/images/PDFs/elevenaviation_gulfstreamG200_spec.pdf`,
+    N523JG: `${CDN}/images/PDFs/elevenaviation_challenger604_spec.pdf`,
+  } as Record<string, string>,
 };
