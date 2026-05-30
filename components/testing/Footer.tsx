@@ -1,10 +1,11 @@
 // PLACEHOLDER: logo is hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
+import Link from "next/link";
 import { ASSETS } from "./cdn";
 
 const NAV_LINKS = [
-  { href: "#aircraft", label: "Aircraft" },
-  { href: "#management", label: "Management" },
-  { href: "#company", label: "Company" },
+  { href: "/testing#aircraft", label: "Aircraft" },
+  { href: "/testing/management", label: "Management" },
+  { href: "/testing/company", label: "Company" },
 ];
 
 export default function Footer() {
@@ -27,12 +28,12 @@ export default function Footer() {
           <ul className="mt-4 space-y-2">
             {NAV_LINKS.map((l) => (
               <li key={l.href}>
-                <a
+                <Link
                   href={l.href}
                   className="text-sm text-white/70 transition hover:text-white"
                 >
                   {l.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>

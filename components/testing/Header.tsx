@@ -3,34 +3,46 @@ import Link from "next/link";
 import { ASSETS } from "./cdn";
 
 const NAV_LINKS = [
-  { href: "#aircraft", label: "Aircraft" },
-  { href: "#management", label: "Management" },
-  { href: "#company", label: "Company" },
+  { href: "/testing#aircraft", label: "Aircraft" },
+  { href: "/testing/management", label: "Management" },
+  { href: "/testing/company", label: "Company" },
 ];
 
-export default function Header() {
+interface HeaderProps {
+  /**
+   * "default" — light CDN logo inverted to black (good on white).
+   * "dark" — uses the dedicated DarkLogo.svg variant as-is.
+   */
+  variant?: "default" | "dark";
+}
+
+export default function Header({ variant = "default" }: HeaderProps) {
+  const logoSrc = variant === "dark" ? ASSETS.darkLogo : ASSETS.logo;
+  const logoStyle =
+    variant === "dark" ? undefined : { filter: "brightness(0)" };
+
   return (
     <header className="sticky top-0 z-30 border-b border-neutral-200 bg-white/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
-        <Link href="#top" aria-label="Eleven Aviation home" className="block">
+        <Link href="/testing" aria-label="Eleven Aviation home" className="block">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={ASSETS.logo}
+            src={logoSrc}
             alt="Eleven Aviation"
             className="h-8 w-auto"
-            style={{ filter: "brightness(0)" }}
+            style={logoStyle}
           />
         </Link>
 
         <nav className="hidden items-center gap-10 md:flex">
           {NAV_LINKS.map((l) => (
-            <a
+            <Link
               key={l.href}
               href={l.href}
               className="text-xs uppercase tracking-[0.25em] text-neutral-700 transition hover:text-gold"
             >
               {l.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
