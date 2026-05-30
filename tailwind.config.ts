@@ -17,10 +17,12 @@ const config: Config = {
         accent: "#3b82f6",
         positive: "#10b981",
         negative: "#ef4444",
+        gold: "#c8a96a",
       },
       fontFamily: {
         sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
+        display: ["var(--font-display)", "Georgia", "serif"],
       },
     },
   },

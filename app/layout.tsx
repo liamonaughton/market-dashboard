@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import TopNav from "@/components/TopNav";
 
 export const metadata: Metadata = {
   title: "Market Dashboard",
@@ -14,6 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="min-h-screen bg-background font-sans text-white">
+        <TopNav />
         {children}
       </body>
     </html>
