@@ -1,3 +1,5 @@
+"use client";
+
 // PLACEHOLDER: form is non-functional — wire up to a real submit handler / form service before launch.
 const INTEREST_OPTIONS = [
   "Aircraft Management",
