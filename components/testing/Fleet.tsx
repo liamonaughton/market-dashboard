@@ -54,18 +54,18 @@ const FLEET: Aircraft[] = [
 
 export default function Fleet() {
   return (
-    <section id="aircraft" className="bg-black py-24">
+    <section id="aircraft" className="bg-neutral-50 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="flex flex-wrap items-end justify-between gap-6">
           <div className="max-w-xl">
             <p className="mb-3 text-[10px] uppercase tracking-[0.4em] text-gold">
               The Fleet
             </p>
-            <h2 className="font-display text-3xl text-white sm:text-4xl md:text-5xl">
+            <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl md:text-5xl">
               Aircraft, curated for the mission.
             </h2>
           </div>
-          <p className="max-w-md text-sm leading-relaxed text-white/60">
+          <p className="max-w-md text-sm leading-relaxed text-neutral-600">
             Each tail in our fleet is selected, maintained, and operated to a
             single standard: yours.
           </p>
@@ -76,10 +76,10 @@ export default function Fleet() {
             {FLEET.map((a) => (
               <article
                 key={a.tail}
-                className="w-[320px] shrink-0 border border-white/10 bg-white/[0.02] transition hover:border-gold/50 sm:w-[360px]"
+                className="w-[320px] shrink-0 border border-neutral-200 bg-white shadow-sm transition hover:border-gold/50 hover:shadow-md sm:w-[360px]"
               >
                 <div
-                  className="flex h-48 items-center justify-center bg-gradient-to-br from-white/5 to-white/[0.02] text-xs uppercase tracking-[0.3em] text-white/30"
+                  className="flex h-48 items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200 text-xs uppercase tracking-[0.3em] text-neutral-400"
                   aria-hidden
                 >
                   Aircraft Image
@@ -88,13 +88,13 @@ export default function Fleet() {
                   <p className="font-mono text-xs uppercase tracking-[0.3em] text-gold">
                     {a.tail}
                   </p>
-                  <h3 className="mt-2 font-display text-2xl text-white">
+                  <h3 className="mt-2 font-display text-2xl text-neutral-900">
                     {a.type}
                   </h3>
-                  <p className="mt-3 text-sm leading-relaxed text-white/60">
+                  <p className="mt-3 text-sm leading-relaxed text-neutral-600">
                     {a.description}
                   </p>
-                  <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-white/10 pt-5 text-xs">
+                  <dl className="mt-6 grid grid-cols-2 gap-3 border-t border-neutral-200 pt-5 text-xs">
                     <Spec label="Endurance" value={a.endurance} />
                     <Spec label="Range" value={a.range} />
                     <Spec label="Passengers" value={a.pax} />
@@ -113,10 +113,10 @@ export default function Fleet() {
 function Spec({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-[10px] uppercase tracking-[0.25em] text-white/40">
+      <dt className="text-[10px] uppercase tracking-[0.25em] text-neutral-400">
         {label}
       </dt>
-      <dd className="mt-1 font-mono text-sm text-white">{value}</dd>
+      <dd className="mt-1 font-mono text-sm text-neutral-900">{value}</dd>
     </div>
   );
 }

@@ -27,16 +27,16 @@ const FEATURES: Feature[] = [
 
 export default function ElevatedExperiences() {
   return (
-    <section id="elevated" className="bg-[#0a0e1a] py-24">
+    <section id="elevated" className="bg-white py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <p className="mb-4 text-[10px] uppercase tracking-[0.4em] text-gold">
             The Eleven Difference
           </p>
-          <h2 className="font-display text-3xl text-white sm:text-4xl md:text-5xl">
+          <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl md:text-5xl">
             Elevated experiences, end to end.
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-white/60">
+          <p className="mt-5 text-base leading-relaxed text-neutral-600">
             Eleven Aviation pairs a meticulously maintained fleet with a team
             that treats every journey as the headline event of your day.
           </p>
@@ -46,14 +46,22 @@ export default function ElevatedExperiences() {
           {FEATURES.map((f) => (
             <div
               key={f.title}
-              className="group border border-white/10 bg-white/[0.02] p-8 transition hover:border-gold/60"
+              className="group border border-neutral-200 bg-white p-8 shadow-sm transition hover:border-gold/60 hover:shadow-md"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={f.icon} alt="" className="h-10 w-10" />
-              <h3 className="mt-6 font-display text-2xl text-white">
+              <img
+                src={f.icon}
+                alt=""
+                className="h-10 w-10"
+                style={{
+                  filter:
+                    "invert(72%) sepia(33%) saturate(437%) hue-rotate(2deg) brightness(91%) contrast(86%)",
+                }}
+              />
+              <h3 className="mt-6 font-display text-2xl text-neutral-900">
                 {f.title}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/60">
+              <p className="mt-3 text-sm leading-relaxed text-neutral-600">
                 {f.body}
               </p>
             </div>

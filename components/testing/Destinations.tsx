@@ -38,16 +38,16 @@ function destinationUrl(file: string) {
 
 export default function Destinations() {
   return (
-    <section className="bg-black py-24">
+    <section className="bg-neutral-50 py-24">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
           <p className="mb-4 text-[10px] uppercase tracking-[0.4em] text-gold">
             Destinations
           </p>
-          <h2 className="font-display text-3xl text-white sm:text-4xl md:text-5xl">
+          <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl md:text-5xl">
             Anywhere worth going.
           </h2>
-          <p className="mt-5 text-base leading-relaxed text-white/60">
+          <p className="mt-5 text-base leading-relaxed text-neutral-600">
             A snapshot of the cities our clients call home — and the ones they
             disappear to.
           </p>
@@ -57,7 +57,7 @@ export default function Destinations() {
           {DESTINATIONS.map((d) => (
             <div
               key={d.name}
-              className="group relative aspect-[4/3] overflow-hidden border border-white/10 bg-white/[0.02]"
+              className="group relative aspect-[4/3] overflow-hidden border border-neutral-200 bg-neutral-100"
             >
               <Image
                 src={destinationUrl(d.file)}

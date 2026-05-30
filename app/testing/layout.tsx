@@ -8,5 +8,9 @@ const playfair = Playfair_Display({
 });
 
 export default function TestingLayout({ children }: { children: ReactNode }) {
-  return <div className={playfair.variable}>{children}</div>;
+  return (
+    <div className={`${playfair.variable} bg-white text-neutral-900`}>
+      {children}
+    </div>
+  );
 }

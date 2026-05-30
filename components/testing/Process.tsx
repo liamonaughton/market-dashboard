@@ -8,12 +8,12 @@ const STEPS = [
 
 export default function Process() {
   return (
-    <section className="bg-[#0a0e1a] py-24">
+    <section className="bg-white py-24">
       <div className="mx-auto max-w-5xl px-6 text-center">
         <p className="mb-4 text-[10px] uppercase tracking-[0.4em] text-gold">
           The Process
         </p>
-        <h2 className="font-display text-3xl text-white sm:text-4xl md:text-5xl">
+        <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl md:text-5xl">
           Delivering seamless, white-glove service
           <br className="hidden sm:block" />
           at every touchpoint.
@@ -26,10 +26,10 @@ export default function Process() {
             key={step}
             className="flex flex-1 basis-[180px] flex-col items-center text-center"
           >
-            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-gold/60 font-display text-lg text-gold">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full border border-gold font-display text-lg text-gold">
               {String(i + 1).padStart(2, "0")}
             </div>
-            <p className="mt-4 text-sm uppercase tracking-[0.2em] text-white">
+            <p className="mt-4 text-sm uppercase tracking-[0.2em] text-neutral-900">
               {step}
             </p>
           </li>
