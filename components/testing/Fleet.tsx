@@ -1,4 +1,7 @@
-// PLACEHOLDER: swap each aircraft image div for a real photo at /public/testing/fleet/<tail>.jpg.
+// PLACEHOLDER: aircraft photos are hotlinked from the Eleven Aviation CDN — see components/testing/cdn.ts.
+import Image from "next/image";
+import { ASSETS } from "./cdn";
+
 interface Aircraft {
   tail: string;
   type: string;
@@ -76,13 +79,16 @@ export default function Fleet() {
             {FLEET.map((a) => (
               <article
                 key={a.tail}
-                className="w-[320px] shrink-0 border border-neutral-200 bg-white shadow-sm transition hover:border-gold/50 hover:shadow-md sm:w-[360px]"
+                className="w-[320px] shrink-0 overflow-hidden border border-neutral-200 bg-white shadow-sm transition hover:border-gold/50 hover:shadow-md sm:w-[360px]"
               >
-                <div
-                  className="flex h-48 items-center justify-center bg-gradient-to-br from-neutral-100 to-neutral-200 text-xs uppercase tracking-[0.3em] text-neutral-400"
-                  aria-hidden
-                >
-                  Aircraft Image
+                <div className="relative h-56 w-full bg-neutral-100">
+                  <Image
+                    src={ASSETS.fleet[a.tail]}
+                    alt={`${a.type} (${a.tail})`}
+                    fill
+                    sizes="(min-width: 640px) 360px, 320px"
+                    className="object-cover"
+                  />
                 </div>
                 <div className="p-6">
                   <p className="font-mono text-xs uppercase tracking-[0.3em] text-gold">

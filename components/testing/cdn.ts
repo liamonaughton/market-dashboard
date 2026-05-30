@@ -11,4 +11,10 @@ export const ASSETS = {
     eyeDollar: `${CDN}/images/Elevated%20Vectors/EyeDollar.svg`,
     shieldPlus: `${CDN}/images/Elevated%20Vectors/ShieldPLus.svg`,
   },
+  fleet: {
+    N11CP: `${CDN}/images/N11CP/Downscaled/DSC07413.jpg`,
+    N224MZ: `${CDN}/images/N224MZ/Downscaled/DSC06607-2.jpg`,
+    N11HM: `${CDN}/images/N11HM/Downscaled/DSC00511.jpg`,
+    N523JG: `${CDN}/images/N523JG/Downscaled/DSC06479-2.jpg`,
+  } as Record<string, string>,
 };
