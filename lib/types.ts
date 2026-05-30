@@ -3,19 +3,11 @@ export interface StockSymbol {
   label: string;
 }
 
-export interface CandlePoint {
-  t: number;
-  c: number;
-}
-
 export interface StockData {
   symbol: string;
   label: string;
   current: number;
   changePct24h: number;
-  high: number;
-  low: number;
-  series: CandlePoint[];
 }
 
 export interface NewsArticle {

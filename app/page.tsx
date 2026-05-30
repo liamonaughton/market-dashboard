@@ -13,7 +13,7 @@ import {
   StockData,
 } from "@/lib/types";
 import FuelPrices from "@/components/FuelPrices";
-import StockCharts from "@/components/StockCharts";
+import StockTicker from "@/components/StockTicker";
 import RateCard from "@/components/RateCard";
 import NewsHeadlines from "@/components/NewsHeadlines";
 
@@ -203,57 +203,59 @@ export default function DashboardPage() {
     : [];
 
   return (
-    <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white">
-            Market Dashboard
-          </h1>
-          <p className="mt-1 text-sm text-muted">
-            {snapshot?.fetchedAt
-              ? `Last updated ${new Date(snapshot.fetchedAt).toLocaleString()}`
-              : loading
-                ? "Loading…"
-                : "No data yet"}
-          </p>
+    <main>
+      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 lg:px-8">
+        <header className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight text-white">
+              Market Dashboard
+            </h1>
+            <p className="mt-1 text-sm text-muted">
+              {snapshot?.fetchedAt
+                ? `Last updated ${new Date(snapshot.fetchedAt).toLocaleString()}`
+                : loading
+                  ? "Loading…"
+                  : "No data yet"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={refresh}
+            disabled={refreshing}
+            className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 text-sm text-white transition hover:border-accent disabled:opacity-60"
+          >
+            {refreshing ? "Refreshing…" : "Refresh now"}
+          </button>
+        </header>
+      </div>
+
+      <StockTicker stocks={stocks} />
+
+      <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <FuelPrices data={snapshot?.fuel ?? null} />
+          <RateCard
+            title="Fed Funds Rate"
+            subtitle="Effective rate, 6-month window"
+            series={fedSeries}
+            badge="FRED"
+          />
+          <RateCard
+            title="Mortgage Rates"
+            subtitle="30-year, last 52 weeks"
+            series={mortgageSeries}
+            badge="Mock data"
+          />
         </div>
-        <button
-          type="button"
-          onClick={refresh}
-          disabled={refreshing}
-          className="rounded-md border border-border bg-surface-elevated px-3 py-1.5 text-sm text-white transition hover:border-accent disabled:opacity-60"
-        >
-          {refreshing ? "Refreshing…" : "Refresh now"}
-        </button>
-      </header>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <FuelPrices data={snapshot?.fuel ?? null} />
-        <RateCard
-          title="Fed Funds Rate"
-          subtitle="Effective rate, 6-month window"
-          series={fedSeries}
-          badge="FRED"
-        />
-        <RateCard
-          title="Mortgage Rates"
-          subtitle="30-year, last 52 weeks"
-          series={mortgageSeries}
-          badge="Mock data"
-        />
+        <div className="mt-8">
+          <NewsHeadlines news={snapshot?.news ?? null} />
+        </div>
+
+        <footer className="mt-10 text-center text-xs text-muted/70">
+          Data refreshes once per day · stored locally in your browser
+        </footer>
       </div>
-
-      <div className="mt-8">
-        <StockCharts stocks={stocks} />
-      </div>
-
-      <div className="mt-8">
-        <NewsHeadlines news={snapshot?.news ?? null} />
-      </div>
-
-      <footer className="mt-10 text-center text-xs text-muted/70">
-        Data refreshes once per day · stored locally in your browser
-      </footer>
     </main>
   );
 }
