@@ -45,15 +45,18 @@ export default function Leadership() {
 
         <div className="mt-16 grid gap-10 md:grid-cols-3">
           {LEADERS.map((l) => (
-            <article key={l.name} className="flex flex-col">
+            <article key={l.name} className="group flex flex-col">
               <div className="relative aspect-[3/4] w-full overflow-hidden bg-neutral-100">
                 <Image
                   src={l.photo}
                   alt={l.name}
                   fill
                   sizes="(min-width: 768px) 33vw, 100vw"
-                  className="object-cover"
+                  className="object-cover transition duration-700 group-hover:scale-105"
                 />
+                <div className="absolute inset-0 flex items-center bg-black/80 p-8 opacity-0 transition-opacity duration-500 group-hover:opacity-100">
+                  <p className="text-sm leading-relaxed text-white">{l.bio}</p>
+                </div>
               </div>
               <div className="mt-6">
                 <h3 className="font-display text-2xl text-neutral-900">
@@ -61,9 +64,6 @@ export default function Leadership() {
                 </h3>
                 <p className="mt-1 text-[10px] uppercase tracking-[0.3em] text-gold">
                   {l.role}
-                </p>
-                <p className="mt-4 text-sm leading-relaxed text-neutral-600">
-                  {l.bio}
                 </p>
               </div>
             </article>

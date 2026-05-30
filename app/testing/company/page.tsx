@@ -10,9 +10,9 @@ export default function CompanyPage() {
     <PasswordGate>
       <div className="bg-white text-neutral-900">
         <Header variant="dark" />
+        <Leadership />
         <WeAreEleven />
         <OurStory />
-        <Leadership />
         <Footer />
       </div>
     </PasswordGate>
