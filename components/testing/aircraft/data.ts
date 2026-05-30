@@ -13,9 +13,9 @@ export interface KV {
 }
 
 export interface AircraftTabContent {
-  interior?: { images: string[] };
-  performance?: { images: string[]; specs: KV[] };
-  layout?: { images: string[]; dimensions?: KV[] };
+  interior?: { text?: string; images?: string[] };
+  performance?: { specs?: KV[]; text?: string; images?: string[] };
+  layout?: { text?: string; dimensions?: KV[]; images?: string[] };
   amenities?: string[];
 }
 
@@ -77,30 +77,19 @@ export const AIRCRAFT: Aircraft[] = [
     gallery: N224MZ_GALLERY,
     tabs: {
       interior: {
-        images: [
-          `${N224MZ_DIR}/DSC06265-2.jpg`,
-          `${N224MZ_DIR}/DSC06296-2.jpg`,
-          `${N224MZ_DIR}/DSC06287-2.jpg`,
-          `${N224MZ_DIR}/DSC06290-2.jpg`,
-        ],
+        text: "The G200 cabin is a true stand-up environment, finished in soft tan leather with polished wood accents and brushed metal trim. A forward double-club configuration anchors the workspace, while the aft three-place divan converts for in-flight rest. Oversized oval windows wash the cabin in natural light, and noise-attenuating panels keep the interior quiet enough for conversation at cruise.",
       },
       performance: {
-        images: [
-          `${N224MZ_DIR}/DSC06549-2.jpg`,
-          `${N224MZ_DIR}/DSC06201-2.jpg`,
-        ],
         specs: [
           { label: "Max Range", value: "2,700 nm" },
           { label: "Max Speed", value: "470 ktas" },
           { label: "Max Altitude", value: "45,000 ft" },
           { label: "Takeoff Distance", value: "5,700 ft" },
         ],
+        text: "Twin Pratt & Whitney PW306A engines push the G200 to a true Mach 0.85 cruise, with the legs for non-stop coast-to-coast service and the runway flexibility to operate from shorter community airports.",
       },
       layout: {
-        images: [
-          `${N224MZ_DIR}/DSC06224-2.jpg`,
-          `${N224MZ_DIR}/DSC06312-2.jpg`,
-        ],
+        text: "Forward galley with a full refreshment center, mid-cabin executive double-club seating for four, aft three-place divan, and an enclosed rear lavatory with private vanity. The externally serviced baggage compartment is accessible in flight.",
         dimensions: [
           { label: "Cabin Length", value: "24 ft 5 in" },
           { label: "Cabin Width", value: "7 ft 2 in" },

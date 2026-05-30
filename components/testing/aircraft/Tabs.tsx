@@ -73,11 +73,7 @@ function renderTab(tab: Tab, aircraft: Aircraft) {
     }
     case "Interior": {
       const i = aircraft.tabs?.interior;
-      return i ? (
-        <Gallery title="Inside the cabin" images={i.images} />
-      ) : (
-        <ComingSoon tab="Interior" />
-      );
+      return i ? <Interior data={i} /> : <ComingSoon tab="Interior" />;
     }
     case "Layout": {
       const l = aircraft.tabs?.layout;
@@ -150,36 +146,62 @@ function Performance({
   data,
 }: {
   aircraft: Aircraft;
-  data: NonNullable<Aircraft["tabs"]>["performance"];
+  data: NonNullable<NonNullable<Aircraft["tabs"]>["performance"]>;
 }) {
-  if (!data) return null;
   return (
-    <div className="space-y-12">
-      <div className="grid gap-6 sm:grid-cols-2">
-        {data.images.map((src, i) => (
-          <PhotoTile key={src} src={src} alt={`${aircraft.name} ${i + 1}`} />
-        ))}
+    <div className="space-y-10">
+      <div>
+        <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl">
+          Performance
+        </h2>
+        {data.text ? (
+          <p className="mt-6 max-w-3xl text-base leading-relaxed text-neutral-600">
+            {data.text}
+          </p>
+        ) : null}
       </div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-        {data.specs.map((s) => (
-          <Stat key={s.label} {...s} />
-        ))}
-      </div>
+      {data.specs && data.specs.length > 0 ? (
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          {data.specs.map((s) => (
+            <Stat key={s.label} {...s} />
+          ))}
+        </div>
+      ) : null}
+      {data.images && data.images.length > 0 ? (
+        <div className="grid gap-6 sm:grid-cols-2">
+          {data.images.map((src, i) => (
+            <PhotoTile key={src} src={src} alt={`${aircraft.name} ${i + 1}`} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
 
-function Gallery({ title, images }: { title: string; images: string[] }) {
+function Interior({
+  data,
+}: {
+  data: NonNullable<NonNullable<Aircraft["tabs"]>["interior"]>;
+}) {
   return (
-    <div>
-      <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl">
-        {title}
-      </h2>
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
-        {images.map((src, i) => (
-          <PhotoTile key={src} src={src} alt={`${title} ${i + 1}`} />
-        ))}
+    <div className="space-y-10">
+      <div>
+        <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl">
+          Inside the cabin
+        </h2>
+        {data.text ? (
+          <p className="mt-6 max-w-3xl text-base leading-relaxed text-neutral-600">
+            {data.text}
+          </p>
+        ) : null}
       </div>
+      {data.images && data.images.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2">
+          {data.images.map((src, i) => (
+            <PhotoTile key={src} src={src} alt={`Cabin ${i + 1}`} />
+          ))}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -190,11 +212,16 @@ function Layout({
   data: NonNullable<NonNullable<Aircraft["tabs"]>["layout"]>;
 }) {
   return (
-    <div className="space-y-12">
-      <div className="grid gap-6 md:grid-cols-2">
-        {data.images.map((src, i) => (
-          <PhotoTile key={src} src={src} alt={`Cabin layout ${i + 1}`} />
-        ))}
+    <div className="space-y-10">
+      <div>
+        <h2 className="font-display text-3xl text-neutral-900 sm:text-4xl">
+          Cabin layout
+        </h2>
+        {data.text ? (
+          <p className="mt-6 max-w-3xl text-base leading-relaxed text-neutral-600">
+            {data.text}
+          </p>
+        ) : null}
       </div>
       {data.dimensions && data.dimensions.length > 0 ? (
         <div>
@@ -206,6 +233,13 @@ function Layout({
               <Stat key={d.label} {...d} />
             ))}
           </div>
+        </div>
+      ) : null}
+      {data.images && data.images.length > 0 ? (
+        <div className="grid gap-6 md:grid-cols-2">
+          {data.images.map((src, i) => (
+            <PhotoTile key={src} src={src} alt={`Cabin layout ${i + 1}`} />
+          ))}
         </div>
       ) : null}
     </div>
